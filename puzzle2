@@ -1,0 +1,61 @@
+#importacio llibreries necessaries i del puzzle 1
+import gi
+import threading
+import time
+from Puzzle1corregido import RFIDReader
+
+#especificacio de la versio del gtk i importacio de les llibreries necessaries d'aquesta
+gi.require_version('Gtk', '3.0')
+from gi.repository import Gtk, GLib, Gdk
+
+class RFIDReaderApp(Gtk.Window):
+    #constructor
+    def __init__(self):
+        #creo la window especificant tamany de la bora i la mida
+        Gtk.Window.__init__(self, title="RFID Reader")
+        self.set_border_width(10)
+        self.set_default_size(600, 300)
+
+        #creo un box en la window per afegir altres eines
+        box = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6)
+        self.add(box)
+
+        #creo el label i el poso de color blau 
+        self.label = Gtk.Label(label="Please, login with your university card")
+        self.label.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(0,0,1,1))
+        box.pack_start(self.label, True, True, 0)
+
+        #creo el boto per netejar 
+        self.button= Gtk.Button(label="Clear")
+        self.button.connect("clicked", self.button_on)
+        box.pack_start(self.button,True, True, 0)
+
+        #creo objecte de la clase rfidreader (puzzle1)
+        self.rfid_reader=RFIDReader()
+
+        #creo fil per llegir uid i l'executo
+        self.thread = threading.Thread(target=self.read_rfid_thread, daemon=True)
+        self.thread.start()
+
+    #funcio per quan cliqui el buto es reinicii la finestra
+    def button_on(self, widget):
+        self.label.set_text("Please, login with your university card")
+        self.label.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(0,0,1,1))
+
+    #funcio per llegir uid en bucle revisant que no sigui None
+    def read_rfid_thread(self):
+        while True:	
+                uid_hex= self.rfid_reader.lectura()  
+                if uid_hex is not None: 
+                    self.label.set_text("UID: "+uid_hex)
+                    self.label.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(1,0,0,1))
+                time.sleep(0.2) 
+
+def main():
+    app = RFIDReaderApp()                #creo objecte clase puzle 2
+    app.connect("destroy", Gtk.main_quit)#faig que es connecti de manera que ho pugui tancar
+    app.show_all()                       #faig que es mostri la finestra i el que passa
+    Gtk.main()                           #executo el gtk
+
+if __name__ == "__main__":
+    main() #executo el main
