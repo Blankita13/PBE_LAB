@@ -48,7 +48,7 @@ class RFIDReaderApp(Gtk.Window):
                 uid_hex= self.rfid_reader.lectura()  
                 if uid_hex is not None: 
                     self.label.set_text("UID: "+uid_hex)
-                    self.label.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(1,0,0,1))
+                    self.label.override_background_color(Gtk.StateType.NORMAL, Gdk.RGBA(1,0,0,1)) #quan llegeix la tarjeta posa el fons del label en vermell
                 time.sleep(0.2) 
 
 def main():
